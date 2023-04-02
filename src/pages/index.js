@@ -1,11 +1,11 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react"
 import Head from 'next/head'
-import Image from "next/image";
-import usetracklocation from "@/hooks/usetracklocation";
-import Banner from "@/components/banner";
-import Card from '@/components/card';
-import getCoffeeShops from "@/helper/utility";
+import useTracklocation from "@/hooks/usetracklocation"
+import Banner from "@/components/banner"
+import Card from '@/components/card'
+import getCoffeeShops from "@/helper/utility"
 import styles from '@/styles/Home.module.css'
+import {ACTION, CoffeeShopsContext} from "@/context/coffee-shops-context";
 
 export async function getStaticProps(context) {
 	const coffeeStores = await getCoffeeShops()
@@ -19,25 +19,31 @@ export async function getStaticProps(context) {
 
 export default function Home(props) {
 	const {
-		latLong,
 		locationErrorMsg,
 		isLocating,
 		handleTrackLocation
-	} = usetracklocation();
+	} = useTracklocation();
 
-	const[nearByCoffeeShops, setNearByCoffeeShops] = useState([]);
+	const { state: { latLong, coffeeStores: nearByCoffeeShops }, dispatch } = useContext(CoffeeShopsContext)
 
 	const handleOnBannerButtonClick = () => {
-		handleTrackLocation();
+		handleTrackLocation()
 	}
 
 	useEffect( () => {
 		async function fetchData() {
 			let currentCoffeeShops = await getCoffeeShops(latLong);
-			setNearByCoffeeShops(currentCoffeeShops)
+			dispatch({
+				type: ACTION.SET_COFFEE_STORES,
+				payload: {
+					coffeeStores: currentCoffeeShops,
+				}
+			})
 		}
-		fetchData();
-	}, [latLong])
+		if (latLong.length > 0) {
+			fetchData()
+		}
+	}, [ latLong ])
 
 	return (
     <>

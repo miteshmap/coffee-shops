@@ -11,12 +11,15 @@ class FourSquare {
 	 *
 	 * @param query
 	 * @param limit
+	 * @param latlng
 	 */
-	setParams = ({query = 'coffee', limit = 10, latlng = null} = {}) => {
-		this.#url += "?";
-		this.#url += `query=${query}`;
-		this.#url += latlng !== null && latlng.length > 0 ? `&ll=${latlng}` : '';
-		this.#url += `&limit=${limit}`;
+	setParams = ({query = 'coffee', limit = 10, latlng = '40.7313924,-74.2520952'} = {}) => {
+		latlng = latlng === null ? '40.7313924,-74.2520952' : latlng
+
+		this.#url += "?"
+		this.#url += `query=${query}`
+		this.#url += `&ll=${latlng}`
+		this.#url += `&limit=${limit}`
 	}
 
 	triggerRequest = async () => {

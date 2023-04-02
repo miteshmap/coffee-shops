@@ -1,53 +1,64 @@
 import { useRouter } from 'next/router'
-import cls from "classnames";
-import getCoffeeStoresData from "@/helper/api/foursquare";
+import cls from "classnames"
+import getCoffeeShops from "@/helper/utility"
+import {useEffect, useContext, useState} from "react";
+import {CoffeeShopsContext} from "@/context/coffee-shops-context";
 
 export async function getStaticProps(context) {
 	const { params: { id } } = context
 
-	const coffeeStoresData = await getCoffeeStoresData(10);
-
+	const coffeeStoresData = await getCoffeeShops();
 	const findCoffeeStore = coffeeStoresData.find(item => item.id.toString() === id)
 
 	return {
 		props: {
-			coffeeStore: findCoffeeStore
+			coffeeStore: findCoffeeStore ?? null
 		}
 	}
 }
 
-// Generates `/coffee-store/1` and `/coffee-store/2`
+// Generates `/coffee-store/1` and `/coffee-store/2`.
 export async function getStaticPaths() {
-	const coffeeStoresData = await getCoffeeStoresData(10);
-	console.log(coffeeStoresData);
+	const coffeeStoresData = await getCoffeeShops();
 	const paths = coffeeStoresData.map(item => {
 		return { params: { id: item.id.toString()}}
 	})
 
 	return {
 		paths,
-		fallback: false,
+		fallback: true,
 	}
 }
 
-
-const CoffeeStore = (props) => {
+const CoffeeStore = (initProp) => {
 	const router = useRouter()
+	const { state: { coffeeStores } } = useContext(CoffeeShopsContext)
+	const [coffeeStore, setCoffeeStore] = useState(initProp.coffeeStore);
 
-	if (router.isFallback) {
-		return <div>Loading...</div>;
-	}
-
-	console.log()
-	console.log(props)
-	// console.log(router.query)
 	const { id } = router.query
 
-	return (<div className={cls('glass')}>
-		{props.coffeeStore.name}
-		{props.coffeeStore.address}
-		{props.coffeeStore.neighbourhood}
-	</div>)
+	useEffect(() => {
+		if ((initProp.coffeeStore == null)
+			|| (initProp.coffeeStore != null && Object.keys(initProp.coffeeStore).length == 0 )) {
+			if (coffeeStores.length > 0) {
+				const newCoffeeStore = coffeeStores.find(item => item.id.toString() === id)
+				console.log(newCoffeeStore)
+				setCoffeeStore(newCoffeeStore)
+			}
+		}
+	}, [id])
+
+	if (router.isFallback) {
+		return <div>Loading...</div>
+	}
+
+	return (coffeeStore != null && (
+		<div className={cls('glass')}>
+			{coffeeStore.name}
+			{coffeeStore.address}
+			{coffeeStore.neighbourhood}
+		</div>
+	))
 }
 
 export default CoffeeStore

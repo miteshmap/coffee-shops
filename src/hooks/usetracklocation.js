@@ -1,15 +1,22 @@
-import {useState} from "react";
+import {useContext, useState } from "react"
+import {ACTION, CoffeeShopsContext} from "@/context/coffee-shops-context";
 
-const usetracklocation = () => {
-	const [latLong, setLatLong] = useState("");
-	const [locationErrorMsg, setLocationError] = useState("");
-	const [isLocating, setLocatingStatus] = useState(false);
+const useTracklocation = () => {
+	const [locationErrorMsg, setLocationError] = useState("")
+	const [isLocating, setLocatingStatus] = useState(false)
+	const { dispatch } = useContext(CoffeeShopsContext);
 
 	const success = (position) => {
 		const latitude = position.coords.latitude
 		const longitude = position.coords.longitude
 
-		setLatLong(`${latitude},${longitude}`)
+		dispatch({
+			type: ACTION.SET_LATLONG,
+			payload: {
+				latLong: `${latitude},${longitude}`,
+			}
+		})
+		// setLatLong()
 		setLocatingStatus(false)
 		setLocationError("")
 	}
@@ -20,21 +27,20 @@ const usetracklocation = () => {
 	}
 
 	const handleTrackLocation = () => {
-		setLocatingStatus(true);
+		setLocatingStatus(true)
 		if (!navigator.geolocation) {
-			setLocationError("Geolocation is not supported by your browser");
+			setLocationError("Geolocation is not supported by your browser")
 			setLocatingStatus(false)
 		} else {
-			navigator.geolocation.getCurrentPosition(success, error);
+			navigator.geolocation.getCurrentPosition(success, error)
 		}
 	}
 
 	return {
-		latLong,
 		locationErrorMsg,
 		isLocating,
 		handleTrackLocation,
 	}
 }
 
-export default usetracklocation;
+export default useTracklocation;
