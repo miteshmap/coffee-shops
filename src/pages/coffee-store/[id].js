@@ -3,6 +3,7 @@ import cls from "classnames"
 import getCoffeeShops from "@/helper/utility"
 import {useEffect, useContext, useState} from "react";
 import {CoffeeShopsContext} from "@/context/coffee-shops-context";
+import { createRecord } from "@/helper/airtable"
 
 export async function getStaticProps(context) {
 	const { params: { id } } = context
@@ -39,14 +40,18 @@ const CoffeeStore = (initProp) => {
 
 	useEffect(() => {
 		if ((initProp.coffeeStore == null)
-			|| (initProp.coffeeStore != null && Object.keys(initProp.coffeeStore).length == 0 )) {
+			|| (initProp.coffeeStore != null && Object.keys(initProp.coffeeStore).length == 0 )
+		) {
 			if (coffeeStores.length > 0) {
 				const newCoffeeStore = coffeeStores.find(item => item.id.toString() === id)
-				console.log(newCoffeeStore)
+				createRecord(newCoffeeStore)
 				setCoffeeStore(newCoffeeStore)
 			}
 		}
-	}, [id])
+		else {
+			createRecord(initProp.coffeeStore)
+		}
+	}, [id, initProp.coffeeStore])
 
 	if (router.isFallback) {
 		return <div>Loading...</div>

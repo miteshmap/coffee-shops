@@ -5,7 +5,7 @@ import Banner from "@/components/banner"
 import Card from '@/components/card'
 import getCoffeeShops from "@/helper/utility"
 import styles from '@/styles/Home.module.css'
-import {ACTION, CoffeeShopsContext} from "@/context/coffee-shops-context";
+import { ACTION, CoffeeShopsContext } from "@/context/coffee-shops-context";
 
 export async function getStaticProps(context) {
 	const coffeeStores = await getCoffeeShops()

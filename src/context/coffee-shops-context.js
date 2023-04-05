@@ -8,7 +8,6 @@ export const ACTION = {
 }
 
 function coffeeStoreReducer(state, action) {
-	console.log(action)
 	switch (action.type) {
 		case ACTION.SET_LATLONG:
 			return {...state, latLong: action.payload.latLong }
